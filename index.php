@@ -12,64 +12,50 @@
 
 </head>
 <body>
+<h2>Your seat reservations</h2>
 
-<!--<form data-bind="submit: addItem">-->
-    New item:
-<!--    <input type="text" data-bind='value: itemToAdd, valueUpdate: "afterkeydown"'>-->
-<!--    <button type="submit" data-bind="enable: itemToAdd().length > 0">Add</button>-->
-    <p>Your items: </p>
-<!--    <select multiple="multiple" width="50" data-bind="options: items"></select>-->
-</form>
-<!--The name is <span data-bind="text: pureComputedFullName"></span>-->
+<table>
+    <thead>
+    <tr>
+        <th>Passenger name</th>
+        <th>Meal</th>
+        <th>Surcharge</th>
+        <th></th>
+    </tr>
+    </thead>
+    <!-- Todo: Generate table body -->
+    <tbody data-bind="foreach: seats">
+    <tr>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: meal().mealName"></td>
+        <td data-bind="text: meal().price"></td>
+    </tr>
+    </tbody>
+</table>
+<script type="text/javascript">
+    function SeatReservation(name, initialMeal) {
+        var self = this;
+        self.name = name;
+        self.meal = ko.observable(initialMeal);
+    }
 
-<script type='text/javascript'>
-    // var SimpleListModel = function(items) {
-    //     var self = this;
-    //
-    //     self.items = ko.observableArray(items);
-    //     self.itemToAdd = ko.observable("");
-    //     self.addItem = function(){
-    //         if(self.itemToAdd != ""){
-    //             self.items.push(self.itemToAdd());
-    //             self.itemToAdd('');
-    //         }
-    //     }.bind(this);
-    //     self.pureComputedExecutions = 0;
-    //     self.computedExecutions = 0;
-    //     self.firstName = ko.observable('Quan');
-    //     self.lastName = ko.observable('Nguyen');
-    //     self.fullName = ko.pureComputed(function(){
-    //         return self.firstName() + " "  + self.lastName();
-    //     }.bind(self));
-    //     self.fullNameComputed = ko.computed(function(){
-    //         return self.firstName() + " "  + self.lastName();
-    //     }.bind(self));
-    // }
-    // ko.applyBindings(new SimpleListModel(["abcc", "aklsjg", "sgajsdlkj"]));
-    function ViewModel() {
+
+    function ReservationsViewModel() {
         var self = this;
 
-        self.firstName = ko.observable('Arshile');
-        self.lastName = ko.observable('Gorky');
-        self.pureComputedExecutions = 0;
-        self.computedExecutions = 0;
+        self.availableMeals = [
+            {mealName: "Standard (sandwich)", price: 0},
+            {mealName: "Premium (lobster)", price: 34.95},
+            {mealName: "Ultimate (whole zebra)", price: 290}
+        ];
 
-        self.pureComputedFullName = ko.pureComputed(function() {
-            // This is NOT recommended
-            self.pureComputedExecutions++;
-            return 'Hello ' + self.firstName() + ' ' + self.lastName();
-        });
-        self.computedFullName = ko.computed(function() {
-            self.computedExecutions++;
+        self.seats = ko.observableArray([
+            new SeatReservation('Steve', self.availableMeals[0]),
+            new SeatReservation('Bob', self.availableMeals[1])
+        ]);
+    }
 
-            return 'Hello ' + self.firstName() + ' ' + self.lastName();
-        });
-    };
-    var viewModel = new ViewModel();
-    ko.applyBindings(viewModel);
-
-    alert('Pure computed executions: ' + viewModel.pureComputedExecutions);
-    alert('Computed executions: ' + viewModel.computedExecutions);
+    ko.applyBindings(new ReservationsViewModel());
 </script>
 </body>
 </html>
