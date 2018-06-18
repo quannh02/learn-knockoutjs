@@ -28,16 +28,24 @@
     <tr>
         <td><input data-bind="text: name"/></td>
         <td><select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select></td>
-        <td data-bind="text: meal().price"></td>
+        <td data-bind="text: formattedPrice"></td>
+        <td><a href="#" data-bind="click: $root.removeSeat">Remove</a></td>
     </tr>
     </tbody>
 </table>
-<button data-bind="click: addSeat">Reserve another seat</button>
+<h3 data-bind="visible: totalSurcharge() > 0">
+    Total surcharge: $<span data-bind="text: totalSurcharge().toFixed(2)"></span>
+</h3>
+<button data-bind="click: addSeat, enable: seats().length < 5">Reserve another seat</button>
 <script type="text/javascript">
     function SeatReservation(name, initialMeal) {
         var self = this;
         self.name = name;
         self.meal = ko.observable(initialMeal);
+        self.formattedPrice = ko.computed(function(){
+            var price = self.meal().price;
+            return price ? "$" + price.toFixed(2) : "None";
+        });
     }
 
 
@@ -58,8 +66,16 @@
         self.addSeat = function(){
             self.seats.push(new SeatReservation('', self.availableMeals[0]));
         };
-    }
+        self.removeSeat = function(seat) { self.seats.remove(seat) }
 
+        self.totalSurcharge = ko.computed(function(){
+            var total = 0;
+            for(var i = 0; i < self.seats().length; i++){
+                total += self.seats()[i].meal().price;
+            }
+            return total;
+        });
+    }
     ko.applyBindings(new ReservationsViewModel());
 </script>
 </body>
