@@ -32,6 +32,7 @@
     </tr>
     </tbody>
 </table>
+<button data-bind="click: addSeat">Reserve another seat</button>
 <script type="text/javascript">
     function SeatReservation(name, initialMeal) {
         var self = this;
@@ -53,6 +54,10 @@
             new SeatReservation('Steve', self.availableMeals[0]),
             new SeatReservation('Bob', self.availableMeals[1])
         ]);
+
+        self.addSeat = function(){
+            self.seats.push(new SeatReservation('', self.availableMeals[0]));
+        };
     }
 
     ko.applyBindings(new ReservationsViewModel());
