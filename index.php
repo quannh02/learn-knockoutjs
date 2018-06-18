@@ -26,8 +26,8 @@
     <!-- Todo: Generate table body -->
     <tbody data-bind="foreach: seats">
     <tr>
-        <td data-bind="text: name"></td>
-        <td data-bind="text: meal().mealName"></td>
+        <td><input data-bind="text: name"/></td>
+        <td><select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select></td>
         <td data-bind="text: meal().price"></td>
     </tr>
     </tbody>
