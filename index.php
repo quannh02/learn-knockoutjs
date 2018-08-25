@@ -46,6 +46,7 @@
             src="https://code.jquery.com/jquery-2.2.4.min.js"
             integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
             crossorigin="anonymous"></script>
+    <script src="sammy.min.js"></script>
 </head>
 <body>
 <!-- Todo: Create UI -->
@@ -88,8 +89,9 @@
         self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
         self.chosenFolderId = ko.observable();
         self.chosenMailData = ko.observable();
-        self.chosenFolderData = ko.observable({mails: [{from: 10, to: 5, subject: 5, date: 55}]});
+        self.chosenFolderData = ko.observable({mails: [{id : 1, folder: 'Inbox', from: 10, to: 5, subject: 5, date: 55}]});
         self.goToFolder = function (folder) {
+            location.hash = folder;
             self.chosenFolderId(folder);
             self.chosenMailData(null);
             $.get('/knockoutjs/mail.php', {folder: folder}, function (returnValue) {
@@ -98,6 +100,7 @@
             });
         };
         self.goToMail = function(mail) {
+            location.hash = mail.folder + '/' + mail.id;
             self.chosenFolderId(mail.folder);
             self.chosenFolderData(null);
             $.get("/knockoutjs/mail.php", { mailId: mail.id }, function (returnValue) {
@@ -105,7 +108,26 @@
                 self.chosenMailData(obj);
             });
         };
-        self.goToFolder('Inbox');
+        Sammy(function() {
+            this.get('#:folder', function() {
+                self.chosenFolderId(this.params.folder);
+                self.chosenMailData(null);
+                $.get("mail.php", { folder: this.params.folder }, function (returnValue) {
+                    var obj = JSON.parse(returnValue);
+                    self.chosenFolderData(obj);
+                });
+            });
+
+            this.get('#:folder/:mailId', function() {
+                self.chosenFolderId(this.params.folder);
+                self.chosenFolderData(null);
+                $.get("mail.php", { mailId: this.params.mailId }, function (returnValue) {
+                    var obj = JSON.parse(returnValue);
+                    self.chosenMailData(obj);
+                });
+            });
+            this.get('', function() { this.app.runRoute('get', 'knockoutjs/#Inbox') });
+        }).run();
     };
 
     ko.applyBindings(new WebmailViewModel());

@@ -7,13 +7,13 @@ $mailId = $_REQUEST['mailId'];
 if ($type) {
     switch ($type) {
         case 'Inbox' :
-            echo '{ "mails": [{"id": 1, "from": 15, "to": 33, "subject": 5, "date": 55}]}';
+            echo '{ "id":"Inbox", "mails": [{ "folder":"Inbox", "id": 1, "from": 15, "to": 33, "subject": 5, "date": 55}]}';
             break;
         case 'Archive':
-            echo '{ "mails": [{"id": 2, "from": 20, "to": 20, "subject": 5, "date": 55}]}';
+            echo '{"id":"Archive", "mails": [{"folder":"Inbox",  "id": 2, "from": 20, "to": 20, "subject": 5, "date": 55}]}';
             break;
         default:
-            echo '{ "mails": [{"id": 3, "from": 10, "to": 10, "subject": 5, "date": 55}]}';
+            echo '{"id":"Sent", "mails": [{"folder":"Inbox", "id": 3, "from": 10, "to": 10, "subject": 5, "date": 55}]}';
             break;
     }
 }
