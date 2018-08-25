@@ -9,74 +9,45 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script type='text/javascript' src='knockout-3.4.2.js'></script>
-
+    <style>
+        .folders .selected {
+            color: red;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
 </head>
 <body>
-<h2>Your seat reservations</h2>
-
-<table>
-    <thead>
-    <tr>
-        <th>Passenger name</th>
-        <th>Meal</th>
-        <th>Surcharge</th>
-        <th></th>
-    </tr>
-    </thead>
-    <!-- Todo: Generate table body -->
-    <tbody data-bind="foreach: seats">
-    <tr>
-        <td><input data-bind="text: name"/></td>
-        <td><select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select></td>
-        <td data-bind="text: formattedPrice"></td>
-        <td><a href="#" data-bind="click: $root.removeSeat">Remove</a></td>
-    </tr>
+<ul class="folders" data-bind="foreach: folders">
+    <li data-bind="text: $data, css: { selected : $data == $root.chosenFolderId() }, click: $root.goToFolder"></li>
+</ul>
+<table class="mails" data-bind="with: chosenFolderData">
+    <thead><tr><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
+    <tbody data-bind="foreach: mails">
+        <tr>
+            <td data-bind="text: from"></td>
+            <td data-bind="text: to"></td>
+            <td data-bind="text: subject"></td>
+            <td data-bind="text: date"></td>
+        </tr>
     </tbody>
 </table>
-<h3 data-bind="visible: totalSurcharge() > 0">
-    Total surcharge: $<span data-bind="text: totalSurcharge().toFixed(2)"></span>
-</h3>
-<button data-bind="click: addSeat, enable: seats().length < 5">Reserve another seat</button>
 <script type="text/javascript">
-    function SeatReservation(name, initialMeal) {
+    function WebmailViewModel() {
         var self = this;
-        self.name = name;
-        self.meal = ko.observable(initialMeal);
-        self.formattedPrice = ko.computed(function(){
-            var price = self.meal().price;
-            return price ? "$" + price.toFixed(2) : "None";
-        });
-    }
-
-
-    function ReservationsViewModel() {
-        var self = this;
-
-        self.availableMeals = [
-            {mealName: "Standard (sandwich)", price: 0},
-            {mealName: "Premium (lobster)", price: 34.95},
-            {mealName: "Ultimate (whole zebra)", price: 290}
-        ];
-
-        self.seats = ko.observableArray([
-            new SeatReservation('Steve', self.availableMeals[0]),
-            new SeatReservation('Bob', self.availableMeals[1])
-        ]);
-
-        self.addSeat = function(){
-            self.seats.push(new SeatReservation('', self.availableMeals[0]));
+        self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
+        self.chosenFolderId = ko.observable();
+        self.chosenFolderData = ko.observable();
+        self.goToFolder = function(folder) {
+            self.chosenFolderId(folder);
+            $.get('/mail', { folder: folder }, self.chosenFolderData);
         };
-        self.removeSeat = function(seat) { self.seats.remove(seat) }
+        self.goToFolder('Inbox');
+    };
 
-        self.totalSurcharge = ko.computed(function(){
-            var total = 0;
-            for(var i = 0; i < self.seats().length; i++){
-                total += self.seats()[i].meal().price;
-            }
-            return total;
-        });
-    }
-    ko.applyBindings(new ReservationsViewModel());
+    ko.applyBindings(new WebmailViewModel());
 </script>
 </body>
 </html>
